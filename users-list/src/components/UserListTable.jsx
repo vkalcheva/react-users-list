@@ -3,18 +3,44 @@ import { useEffect, useState } from "react";
 import * as userService from "../services/userService";
 
 import UserListItem from "./UserListItem";
+import CreateUserModal from "./CreateUserModal";
 
 export default function UserListTable() {
     const [users, setUsers] = useState([]);
-    console.log(users);
+    const [showCreate, setShowCreate] = useState(false);
+
     useEffect(() => {
         userService.getAll()
             .then(result => setUsers(result));
+        // .catch (err => console.log(err));
 
     }, []);
 
+    const createUserClickHandler = () => {
+        setShowCreate(true);
+    };
+
+    const hideCreateUserModal = () => {
+        setShowCreate(false);
+    };
+
+    const userCreateHendler = async (e) => {
+        e.preventDefault();
+
+        const data = Object.fromEntries(new FormData(e.currentTarget));
+        const newUser = await userService.create(data);
+        setUsers(state => [...state, newUser]);
+        setShowCreate(false);
+    };
+
     return (
         <div className="table-wrapper">
+            {showCreate &&
+                <CreateUserModal
+                    hideModal={hideCreateUserModal}
+                    onUserCreate={userCreateHendler}
+                />}
+
             <table className="table">
                 <thead>
                     <tr>
@@ -126,11 +152,22 @@ export default function UserListTable() {
                         <UserListItem
                             key={user._id}
                             {...user}
+                        // createdAt={user.createdAt}
+                        // email={user.email}
+                        // firstName={user.firstName}
+                        // imageUrl={user.imageUrl}
+                        // lastName={user.lastName}
+                        // phoneNumber={user.phoneNumber}
+
                         />
                     ))}
 
                 </tbody>
             </table>
+
+            <button className="btn-add btn" onClick={createUserClickHandler}>Add new user</button>
+
+
         </div>
     );
-}
+};
