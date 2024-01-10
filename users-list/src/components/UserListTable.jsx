@@ -4,10 +4,12 @@ import * as userService from "../services/userService";
 
 import UserListItem from "./UserListItem";
 import CreateUserModal from "./CreateUserModal";
+import UserInfoModal from "./UserInfoModal";
 
 export default function UserListTable() {
     const [users, setUsers] = useState([]);
     const [showCreate, setShowCreate] = useState(false);
+    const [showInfo, setShowInfo] = useState(false);
 
     useEffect(() => {
         userService.getAll()
@@ -33,12 +35,22 @@ export default function UserListTable() {
         setShowCreate(false);
     };
 
+    const userInfoClickHendler = async (userId) => {
+        const userDetails = await userService.getOne(userId);
+        console.log(userDetails)
+    };
+
     return (
         <div className="table-wrapper">
             {showCreate &&
                 <CreateUserModal
                     hideModal={hideCreateUserModal}
                     onUserCreate={userCreateHendler}
+                />}
+            {showInfo &&
+                <UserInfoModal
+                    hideModal={() => setShowInfo(false)}
+
                 />}
 
             <table className="table">
@@ -151,7 +163,9 @@ export default function UserListTable() {
                     {users.map(user => (
                         <UserListItem
                             key={user._id}
+                            userId={user._id}
                             {...user}
+                            onInfoClick={userInfoClickHendler}
                         // createdAt={user.createdAt}
                         // email={user.email}
                         // firstName={user.firstName}
