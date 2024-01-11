@@ -5,11 +5,13 @@ import * as userService from "../services/userService";
 import UserListItem from "./UserListItem";
 import CreateUserModal from "./CreateUserModal";
 import UserInfoModal from "./UserInfoModal";
+import UserDeleteModal from "./UserDeleteModal";
 
 export default function UserListTable() {
     const [users, setUsers] = useState([]);
     const [showCreate, setShowCreate] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
+    const [showDelete, setShowDelete] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
 
 
@@ -42,6 +44,22 @@ export default function UserListTable() {
         setShowInfo(true);
     };
 
+    const deleteUserClickHandler = (userId) => {
+        setSelectedUser(userId);
+        setShowDelete(true);
+    };
+
+    const deleteUserHandler = async () => {
+        // Remove user from server
+        const result = await userService.remove(selectedUser);
+
+        //Remove user from state
+        setUsers(state => state.filter(user => user._id !== selectedUser));
+
+        // Close delete modal
+        setShowDelete(false);
+    };
+
     return (
         <div className="table-wrapper">
             {showCreate &&
@@ -53,7 +71,11 @@ export default function UserListTable() {
                 <UserInfoModal
                     hideModal={() => setShowInfo(false)}
                     userId={selectedUser}
-
+                />}
+            {showDelete &&
+                <UserDeleteModal
+                    hideModal={() => setShowDelete(false)}
+                    onDelete={deleteUserHandler}
                 />}
 
             <table className="table">
@@ -169,6 +191,7 @@ export default function UserListTable() {
                             userId={user._id}
                             {...user}
                             onInfoClick={userInfoClickHendler}
+                            onDeleteClick={deleteUserClickHandler}
                         // createdAt={user.createdAt}
                         // email={user.email}
                         // firstName={user.firstName}
