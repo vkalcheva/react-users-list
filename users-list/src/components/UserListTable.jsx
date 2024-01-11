@@ -10,6 +10,8 @@ export default function UserListTable() {
     const [users, setUsers] = useState([]);
     const [showCreate, setShowCreate] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+
 
     useEffect(() => {
         userService.getAll()
@@ -36,8 +38,8 @@ export default function UserListTable() {
     };
 
     const userInfoClickHendler = async (userId) => {
-        const userDetails = await userService.getOne(userId);
-        console.log(userDetails)
+        setSelectedUser(userId);
+        setShowInfo(true);
     };
 
     return (
@@ -50,6 +52,7 @@ export default function UserListTable() {
             {showInfo &&
                 <UserInfoModal
                     hideModal={() => setShowInfo(false)}
+                    userId={selectedUser}
 
                 />}
 
